@@ -1,86 +1,6 @@
-// Sample email data
-const emailData = {
-    inbox: [
-        {
-            id: 1,
-            sender: "John Doe",
-            subject: "Project Update",
-            preview: "Hey team, I wanted to give you an update on the current project status. We've made significant progress this week...",
-            content: "Hey team,\n\nI wanted to give you an update on the current project status. We've made significant progress this week and I'm excited to share some of the milestones we've achieved.\n\nKey accomplishments:\n- Completed the user authentication module\n- Finished the database design\n- Started working on the frontend components\n\nNext steps:\n- Implement the API endpoints\n- Create the user dashboard\n- Set up testing framework\n\nLet me know if you have any questions!\n\nBest regards,\nJohn",
-            time: "2 hours ago",
-            unread: true
-        },
-        {
-            id: 2,
-            sender: "Sarah Johnson",
-            subject: "Meeting Reminder",
-            preview: "Don't forget about our team meeting tomorrow at 2 PM. We'll be discussing the quarterly goals and upcoming deadlines...",
-            content: "Hi everyone,\n\nDon't forget about our team meeting tomorrow at 2 PM in Conference Room B. We'll be discussing:\n\n1. Quarterly goals review\n2. Upcoming project deadlines\n3. Resource allocation\n4. Q&A session\n\nPlease come prepared with your progress reports and any questions you might have.\n\nSee you tomorrow!\n\nSarah",
-            time: "5 hours ago",
-            unread: true
-        },
-        {
-            id: 3,
-            sender: "IT Support",
-            subject: "System Maintenance Notice",
-            preview: "Scheduled system maintenance will occur this weekend. Please save all your work and log out by Friday 6 PM...",
-            content: "Dear Users,\n\nThis is to inform you that scheduled system maintenance will occur this weekend from Saturday 8 PM to Sunday 6 AM.\n\nDuring this time:\n- All systems will be unavailable\n- No access to email or internal tools\n- Please save all work and log out by Friday 6 PM\n\nWe apologize for any inconvenience and appreciate your cooperation.\n\nIT Support Team",
-            time: "1 day ago",
-            unread: false
-        },
-        {
-            id: 4,
-            sender: "Marketing Team",
-            subject: "New Campaign Launch",
-            preview: "We're excited to announce the launch of our new marketing campaign! The creative team has been working hard...",
-            content: "Hello Everyone,\n\nWe're excited to announce the launch of our new marketing campaign 'Innovation Forward'!\n\nThe creative team has been working hard on this for the past month, and we're thrilled with the results. The campaign will focus on:\n\n- Brand awareness\n- Product innovation messaging\n- Customer engagement\n- Market expansion\n\nLaunch date: Next Monday\nChannels: Social media, email, and web\n\nLet's make this a success!\n\nMarketing Team",
-            time: "2 days ago",
-            unread: false
-        },
-        {
-            id: 5,
-            sender: "HR Department",
-            subject: "Employee Benefits Update",
-            preview: "Important updates to our employee benefits package. Please review the attached documents for details...",
-            content: "Dear Team,\n\nWe have important updates to our employee benefits package effective next month:\n\n1. Enhanced health insurance coverage\n2. Increased vacation days\n3. New professional development budget\n4. Flexible work arrangements\n5. Wellness program expansion\n\nPlease schedule a meeting with HR if you have questions about these changes.\n\nThank you,\nHR Department",
-            time: "3 days ago",
-            unread: true
-        }
-    ],
-    sent: [
-        {
-            id: 101,
-            sender: "You",
-            subject: "Re: Project Timeline",
-            preview: "Thanks for the update. I've reviewed the timeline and it looks good...",
-            content: "Hi Team,\n\nThanks for the update. I've reviewed the timeline and it looks good to me.\n\nI have a few suggestions:\n- Consider adding buffer time for testing\n- Schedule regular check-ins\n- Prepare backup plans for critical tasks\n\nLet me know what you think.\n\nBest,\nYou",
-            time: "1 hour ago",
-            unread: false
-        }
-    ],
-    drafts: [
-        {
-            id: 201,
-            sender: "You",
-            subject: "Draft: Quarterly Report",
-            preview: "Working on the quarterly report. Need to add more details about performance metrics...",
-            content: "Draft content for quarterly report...\n\n[This is a draft email that hasn't been sent yet]",
-            time: "30 minutes ago",
-            unread: false
-        },
-        {
-            id: 202,
-            sender: "You",
-            subject: "Draft: Vacation Request",
-            preview: "Planning to submit vacation request for next month...",
-            content: "Dear Manager,\n\nI would like to request vacation time for...\n\n[Draft not completed]",
-            time: "2 hours ago",
-            unread: false
-        }
-    ],
-    trash: [],
-    spam: []
-};
+// Email data cache
+let emailCache = {};
+const API_BASE = window.location.origin + '/api';
 
 let currentFolder = 'inbox';
 let selectedEmails = new Set();
@@ -98,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Load emails for a specific folder
-function loadEmails(folder) {
+async function loadEmails(folder) {
     currentFolder = folder;
     const emailItems = document.getElementById('email-items');
     const folderTitle = document.getElementById('folder-title');
@@ -108,14 +28,22 @@ function loadEmails(folder) {
     
     // Update active nav item
     document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-    event?.target.classList.add('active');
+    if (event?.target) {
+        event.target.classList.add('active');
+    }
     
     // Show loading
     emailItems.innerHTML = '<div class="loading">Loading emails...</div>';
     
-    // Simulate loading delay
-    setTimeout(() => {
-        const emails = emailData[folder] || [];
+    try {
+        const response = await fetch(`${API_BASE}/emails/${folder}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const emails = await response.json();
+        emailCache[folder] = emails;
+        
         emailItems.innerHTML = '';
         
         if (emails.length === 0) {
@@ -127,7 +55,21 @@ function loadEmails(folder) {
             const emailElement = createEmailElement(email);
             emailItems.appendChild(emailElement);
         });
-    }, 500);
+        
+        // Update folder counts
+        updateFolderCounts();
+        
+    } catch (error) {
+        console.error('Error loading emails:', error);
+        emailItems.innerHTML = `
+            <div style="padding: 2rem; text-align: center; color: #e74c3c;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Failed to load emails</p>
+                <p style="font-size: 0.8rem; color: #666;">${error.message}</p>
+                <button onclick="testConnection()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Connection</button>
+            </div>
+        `;
+    }
 }
 
 // Create email list item element
@@ -137,42 +79,109 @@ function createEmailElement(email) {
     div.onclick = () => selectEmail(email, div);
     
     div.innerHTML = `
-        <input type="checkbox" class="email-checkbox" onclick="event.stopPropagation(); toggleEmailSelection(${email.id}, this)">
+        <input type="checkbox" class="email-checkbox" onclick="event.stopPropagation(); toggleEmailSelection('${email.uid}', this)">
         <div class="email-sender">${email.sender}</div>
         <div class="email-preview-subject">${email.subject}</div>
-        <div class="email-preview">${email.preview}</div>
+        <div class="email-preview">${email.preview || 'No preview available'}</div>
         <div class="email-time">${email.time}</div>
     `;
     
     return div;
 }
 
+// Update folder counts based on unread emails
+function updateFolderCounts() {
+    const folders = ['inbox', 'sent', 'drafts', 'trash', 'spam'];
+    
+    folders.forEach(folder => {
+        const emails = emailCache[folder] || [];
+        const unreadCount = emails.filter(email => email.unread).length;
+        
+        // Find the nav item and update count
+        const navItems = document.querySelectorAll('.nav-menu li');
+        navItems.forEach(item => {
+            if (item.onclick && item.onclick.toString().includes(`'${folder}'`)) {
+                const countSpan = item.querySelector('.count');
+                if (unreadCount > 0) {
+                    if (countSpan) {
+                        countSpan.textContent = unreadCount;
+                        countSpan.style.display = 'inline';
+                    } else {
+                        const newCountSpan = document.createElement('span');
+                        newCountSpan.className = 'count';
+                        newCountSpan.textContent = unreadCount;
+                        item.appendChild(newCountSpan);
+                    }
+                } else if (countSpan) {
+                    countSpan.style.display = 'none';
+                }
+            }
+        });
+    });
+}
+
+// Test connection function
+async function testConnection() {
+    try {
+        const response = await fetch(`${API_BASE}/test-connection`);
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('IMAP connection successful!');
+        } else {
+            alert(`Connection failed: ${result.details}`);
+        }
+    } catch (error) {
+        alert(`Connection test failed: ${error.message}`);
+    }
+}
+
 // Select and display email
-function selectEmail(email, element) {
+async function selectEmail(email, element) {
     // Update visual selection
     document.querySelectorAll('.email-item').forEach(item => item.classList.remove('selected'));
     element.classList.add('selected');
     
-    // Mark as read
+    // Mark as read visually
     element.classList.remove('unread');
-    if (emailData[currentFolder]) {
-        const emailIndex = emailData[currentFolder].findIndex(e => e.id === email.id);
-        if (emailIndex !== -1) {
-            emailData[currentFolder][emailIndex].unread = false;
-        }
-    }
     
     currentEmail = email;
-    displayEmailContent(email);
+    await displayEmailContent(email);
+    
+    // Mark as read on server if it was unread
+    if (email.unread) {
+        try {
+            await fetch(`${API_BASE}/email/${email.uid}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ folder: currentFolder })
+            });
+            
+            // Update cache
+            if (emailCache[currentFolder]) {
+                const emailIndex = emailCache[currentFolder].findIndex(e => e.uid === email.uid);
+                if (emailIndex !== -1) {
+                    emailCache[currentFolder][emailIndex].unread = false;
+                }
+            }
+            
+            updateFolderCounts();
+        } catch (error) {
+            console.error('Error marking email as read:', error);
+        }
+    }
 }
 
 // Display email content
-function displayEmailContent(email) {
+async function displayEmailContent(email) {
     const subjectElement = document.getElementById('email-subject');
     const bodyElement = document.getElementById('email-body');
     
     subjectElement.textContent = email.subject;
     
+    // Show loading for email content
     bodyElement.innerHTML = `
         <div class="email-header">
             <div class="email-meta">
@@ -181,8 +190,50 @@ function displayEmailContent(email) {
                 <strong>Date:</strong> <span>${email.time}</span>
             </div>
         </div>
-        <div class="email-message">${email.content}</div>
+        <div class="loading" style="padding: 2rem;">Loading email content...</div>
     `;
+    
+    try {
+        const response = await fetch(`${API_BASE}/email/${email.uid}?folder=${currentFolder}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const emailData = await response.json();
+        
+        bodyElement.innerHTML = `
+            <div class="email-header">
+                <div class="email-meta">
+                    <strong>From:</strong> <span>${email.sender}</span>
+                    <strong>Subject:</strong> <span>${email.subject}</span>
+                    <strong>Date:</strong> <span>${email.time}</span>
+                </div>
+            </div>
+            <div class="email-message">${emailData.html || emailData.content || 'No content available'}</div>
+            ${emailData.attachments && emailData.attachments.length > 0 ? 
+                `<div class="email-attachments">
+                    <h4>Attachments:</h4>
+                    ${emailData.attachments.map(att => `<div class="attachment">${att.filename || 'Unnamed attachment'}</div>`).join('')}
+                </div>` : ''
+            }
+        `;
+    } catch (error) {
+        console.error('Error loading email content:', error);
+        bodyElement.innerHTML = `
+            <div class="email-header">
+                <div class="email-meta">
+                    <strong>From:</strong> <span>${email.sender}</span>
+                    <strong>Subject:</strong> <span>${email.subject}</span>
+                    <strong>Date:</strong> <span>${email.time}</span>
+                </div>
+            </div>
+            <div style="padding: 2rem; text-align: center; color: #e74c3c;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Failed to load email content</p>
+                <p style="font-size: 0.8rem; color: #666;">${error.message}</p>
+            </div>
+        `;
+    }
 }
 
 // Folder navigation
@@ -207,66 +258,59 @@ function selectAllEmails() {
     const checkboxes = document.querySelectorAll('.email-checkbox');
     const allChecked = Array.from(checkboxes).every(cb => cb.checked);
     
-    checkboxes.forEach(checkbox => {
+    checkboxes.forEach((checkbox, index) => {
         checkbox.checked = !allChecked;
-        const emailId = parseInt(checkbox.onclick.toString().match(/\d+/)[0]);
-        if (!allChecked) {
-            selectedEmails.add(emailId);
-        } else {
-            selectedEmails.delete(emailId);
+        // Get email ID from the current folder cache
+        const emails = emailCache[currentFolder] || [];
+        if (emails[index]) {
+            if (!allChecked) {
+                selectedEmails.add(emails[index].uid);
+            } else {
+                selectedEmails.delete(emails[index].uid);
+            }
         }
     });
 }
 
-function deleteSelected() {
+async function deleteSelected() {
     if (selectedEmails.size === 0) {
         alert('Please select emails to delete');
         return;
     }
     
     if (confirm(`Delete ${selectedEmails.size} selected email(s)?`)) {
-        // Move to trash
-        selectedEmails.forEach(emailId => {
-            const emailIndex = emailData[currentFolder].findIndex(e => e.id === emailId);
-            if (emailIndex !== -1) {
-                const email = emailData[currentFolder].splice(emailIndex, 1)[0];
-                emailData.trash.push(email);
-            }
-        });
-        
+        // Note: Actual deletion would require IMAP STORE command implementation
+        // For now, we'll just remove from cache and reload
+        alert('Email deletion not yet implemented with IMAP. This would move emails to trash.');
         selectedEmails.clear();
-        loadEmails(currentFolder);
-        
-        // Clear email content if current email was deleted
-        if (currentEmail && selectedEmails.has(currentEmail.id)) {
-            document.getElementById('email-subject').textContent = 'Select an email to read';
-            document.getElementById('email-body').innerHTML = `
-                <div class="welcome-message">
-                    <i class="fas fa-envelope-open-text fa-3x"></i>
-                    <h3>Welcome to Email Reader</h3>
-                    <p>Select an email from the list to start reading.</p>
-                </div>
-            `;
-            currentEmail = null;
-        }
+        await loadEmails(currentFolder);
     }
 }
 
-function markAsRead() {
+async function markAsRead() {
     if (selectedEmails.size === 0) {
         alert('Please select emails to mark as read');
         return;
     }
     
-    selectedEmails.forEach(emailId => {
-        const emailIndex = emailData[currentFolder].findIndex(e => e.id === emailId);
-        if (emailIndex !== -1) {
-            emailData[currentFolder][emailIndex].unread = false;
+    try {
+        // Mark each selected email as read
+        for (const uid of selectedEmails) {
+            await fetch(`${API_BASE}/email/${uid}/read`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ folder: currentFolder })
+            });
         }
-    });
-    
-    selectedEmails.clear();
-    loadEmails(currentFolder);
+        
+        selectedEmails.clear();
+        await loadEmails(currentFolder);
+    } catch (error) {
+        console.error('Error marking emails as read:', error);
+        alert('Failed to mark emails as read');
+    }
 }
 
 // Email actions

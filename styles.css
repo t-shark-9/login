@@ -330,6 +330,35 @@ body {
     color: #333;
 }
 
+.email-attachments {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #2196f3;
+}
+
+.email-attachments h4 {
+    margin-bottom: 1rem;
+    color: #2c3e50;
+}
+
+.attachment {
+    padding: 0.5rem;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.attachment::before {
+    content: '📎';
+    margin-right: 0.5rem;
+}
+
 /* Modal */
 .modal {
     display: none;
