@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Reader</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="email-app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1><i class="fas fa-envelope"></i> Email Reader</h1>
+            </div>
+            <div class="header-right">
+                <button class="btn-primary" onclick="composeEmail()">
+                    <i class="fas fa-edit"></i> Compose
+                </button>
+                <button class="btn-secondary" onclick="refreshEmails()">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <ul>
+                        <li class="active" onclick="showFolder('inbox')">
+                            <i class="fas fa-inbox"></i> Inbox <span class="count">5</span>
+                        </li>
+                        <li onclick="showFolder('sent')">
+                            <i class="fas fa-paper-plane"></i> Sent
+                        </li>
+                        <li onclick="showFolder('drafts')">
+                            <i class="fas fa-file-alt"></i> Drafts <span class="count">2</span>
+                        </li>
+                        <li onclick="showFolder('trash')">
+                            <i class="fas fa-trash"></i> Trash
+                        </li>
+                        <li onclick="showFolder('spam')">
+                            <i class="fas fa-exclamation-triangle"></i> Spam
+                        </li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <!-- Email List -->
+            <section class="email-list">
+                <div class="email-list-header">
+                    <h2 id="folder-title">Inbox</h2>
+                    <div class="email-actions">
+                        <button onclick="selectAllEmails()">Select All</button>
+                        <button onclick="deleteSelected()">Delete</button>
+                        <button onclick="markAsRead()">Mark as Read</button>
+                    </div>
+                </div>
+                <div class="email-items" id="email-items">
+                    <!-- Email items will be dynamically loaded here -->
+                </div>
+            </section>
+
+            <!-- Email Content -->
+            <section class="email-content">
+                <div class="email-content-header">
+                    <div class="email-subject" id="email-subject">
+                        Select an email to read
+                    </div>
+                    <div class="email-actions-right">
+                        <button onclick="replyEmail()"><i class="fas fa-reply"></i> Reply</button>
+                        <button onclick="forwardEmail()"><i class="fas fa-share"></i> Forward</button>
+                        <button onclick="deleteCurrentEmail()"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                </div>
+                <div class="email-body" id="email-body">
+                    <div class="welcome-message">
+                        <i class="fas fa-envelope-open-text fa-3x"></i>
+                        <h3>Welcome to Email Reader</h3>
+                        <p>Select an email from the list to start reading.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Compose Email Modal -->
+    <div id="compose-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Compose Email</h3>
+                <span class="close" onclick="closeComposeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="compose-form">
+                    <div class="form-group">
+                        <label for="to">To:</label>
+                        <input type="email" id="to" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="subject">Subject:</label>
+                        <input type="text" id="subject" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Message:</label>
+                        <textarea id="message" rows="10" required></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Send</button>
+                        <button type="button" class="btn-secondary" onclick="closeComposeModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
