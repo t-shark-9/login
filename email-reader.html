@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Reader - IMAP Client</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <header>
+            <h1>📧 Email Reader</h1>
+            <p>Connect to your IMAP email and analyze your messages</p>
+        </header>
+
+        <main>
+            <div class="email-container">
+                <h2>IMAP Connection Setup</h2>
+                <form id="imapForm">
+                    <div class="form-group">
+                        <label for="email">Email Address:</label>
+                        <input type="email" id="email" name="email" required placeholder="your.email@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Email Password:</label>
+                        <input type="password" id="password" name="password" required placeholder="Your email password">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imapServer">IMAP Server:</label>
+                        <input type="text" id="imapServer" name="imapServer" placeholder="imap.gmail.com" value="imap.gmail.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="imapPort">IMAP Port:</label>
+                        <input type="number" id="imapPort" name="imapPort" placeholder="993" value="993">
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Connect to Email</button>
+                </form>
+            </div>
+
+            <div class="email-container" id="emailDisplay" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Email Messages</h2>
+                    <button class="btn btn-secondary" onclick="refreshEmails()">Refresh</button>
+                </div>
+                
+                <div class="email-list" id="emailList">
+                    <!-- Emails will be loaded here -->
+                </div>
+            </div>
+
+            <div class="email-container" id="emailAnalysis" style="display: none;">
+                <h2>📊 Email Analysis</h2>
+                <div id="analysisResults">
+                    <div class="analysis-item">
+                        <h3>Email Statistics</h3>
+                        <p id="emailCount">Total emails: Loading...</p>
+                        <p id="unreadCount">Unread emails: Loading...</p>
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <h3>Top Senders</h3>
+                        <div id="topSenders">Loading...</div>
+                    </div>
+                    
+                    <div class="analysis-item">
+                        <h3>Email Frequency</h3>
+                        <div id="emailFrequency">Loading...</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="email-container">
+                <h2>⚠️ Important Note</h2>
+                <p><strong>IMAP Email Reading:</strong> This is a demonstration interface. Real IMAP functionality requires a backend server due to browser security restrictions. The interface shows how the email reader would work.</p>
+                <p><strong>For full functionality:</strong> You would need to implement a server-side component (Node.js, Python, etc.) that handles IMAP connections and serves the data to this frontend.</p>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn btn-secondary" onclick="simulateEmailLoad()">Simulate Email Loading</button>
+                    <button class="btn btn-secondary" onclick="showAnalysis()" style="margin-left: 10px;">Show Analysis Demo</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="email-reader.js"></script>
+</body>
+</html>

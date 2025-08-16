@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Overview - Password Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        
+        <header>
+            <h1>🔐 Account Overview</h1>
+            <p>Manage your personal information and online service passwords</p>
+        </header>
+
+        <main>
+            <div class="form-container">
+                <h2>Personal Information</h2>
+                <form id="personalInfoForm">
+                    <div class="form-group">
+                        <label for="primaryEmail">Primary Email:</label>
+                        <input type="email" id="primaryEmail" name="primaryEmail" placeholder="your.primary@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="secondaryEmail">Secondary Email:</label>
+                        <input type="email" id="secondaryEmail" name="secondaryEmail" placeholder="your.secondary@email.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="workEmail">Work Email:</label>
+                        <input type="email" id="workEmail" name="workEmail" placeholder="your.work@company.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phoneNumber">Phone Number:</label>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="+1 (555) 123-4567">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="generalPassword">Generalized Password:</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="password" id="generalPassword" name="generalPassword" placeholder="Enter your generalized password" style="flex: 1;">
+                            <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility('generalPassword')">👁️</button>
+                            <button type="button" class="btn btn-secondary" onclick="generatePassword()">🎲 Generate</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="button" class="btn btn-primary" onclick="applyGeneralizedPassword()">
+                            📋 Apply Generalized Password to All Checked Services
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="form-container">
+                <h2>Online Services</h2>
+                <p style="margin-bottom: 20px; color: #666;">Check the services you want to manage and enter their passwords. Use the "Apply Generalized Password" button to fill all checked services with your generalized password.</p>
+                
+                <div id="servicesContainer">
+                    <!-- Google Services -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="google">
+                            <span class="service-logo">🔍</span>
+                            <span class="service-name">Google</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Google password" data-service="google">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- YouTube -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="youtube">
+                            <span class="service-logo">📺</span>
+                            <span class="service-name">YouTube</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="YouTube password" data-service="youtube">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Amazon -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="amazon">
+                            <span class="service-logo">📦</span>
+                            <span class="service-name">Amazon</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Amazon password" data-service="amazon">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Netflix -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="netflix">
+                            <span class="service-logo">🎬</span>
+                            <span class="service-name">Netflix</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Netflix password" data-service="netflix">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Facebook -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="facebook">
+                            <span class="service-logo">📘</span>
+                            <span class="service-name">Facebook</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Facebook password" data-service="facebook">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Twitter/X -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="twitter">
+                            <span class="service-logo">🐦</span>
+                            <span class="service-name">Twitter/X</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Twitter/X password" data-service="twitter">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Microsoft -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="microsoft">
+                            <span class="service-logo">🪟</span>
+                            <span class="service-name">Microsoft</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Microsoft password" data-service="microsoft">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Apple -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="apple">
+                            <span class="service-logo">🍎</span>
+                            <span class="service-name">Apple</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Apple password" data-service="apple">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Spotify -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="spotify">
+                            <span class="service-logo">🎵</span>
+                            <span class="service-name">Spotify</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Spotify password" data-service="spotify">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- LinkedIn -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="linkedin">
+                            <span class="service-logo">💼</span>
+                            <span class="service-name">LinkedIn</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="LinkedIn password" data-service="linkedin">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- Discord -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="discord">
+                            <span class="service-logo">🎮</span>
+                            <span class="service-name">Discord</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="Discord password" data-service="discord">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                    
+                    <!-- GitHub -->
+                    <div class="service-item">
+                        <div class="service-info">
+                            <input type="checkbox" class="service-checkbox" id="github">
+                            <span class="service-logo">🐙</span>
+                            <span class="service-name">GitHub</span>
+                        </div>
+                        <input type="password" class="password-input" placeholder="GitHub password" data-service="github">
+                        <button type="button" class="btn btn-secondary" onclick="togglePasswordVisibility(this)" style="margin-left: 10px;">👁️</button>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; text-align: center;">
+                    <button type="button" class="btn btn-primary" onclick="saveAllData()">💾 Save All Information</button>
+                    <button type="button" class="btn btn-secondary" onclick="loadSavedData()" style="margin-left: 10px;">📂 Load Saved Data</button>
+                    <button type="button" class="btn btn-secondary" onclick="clearAllData()" style="margin-left: 10px;">🗑️ Clear All</button>
+                </div>
+            </div>
+
+            <div class="form-container">
+                <h2>⚠️ Security Notice</h2>
+                <p><strong>Important:</strong> This is a demonstration interface for managing passwords locally in your browser. For production use, consider:</p>
+                <ul style="margin: 15px 0; padding-left: 30px;">
+                    <li>Using established password managers like Bitwarden, 1Password, or LastPass</li>
+                    <li>Implementing proper encryption for password storage</li>
+                    <li>Using secure authentication methods</li>
+                    <li>Regular security audits and updates</li>
+                </ul>
+                <p>The current implementation stores data in browser localStorage, which should only be used for development/testing purposes.</p>
+            </div>
+        </main>
+    </div>
+
+    <script src="account-overview.js"></script>
+</body>
+</html>
